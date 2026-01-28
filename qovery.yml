@@ -1,0 +1,15 @@
+containers:
+  # Build the user code image - referenced by the Helm chart
+  - name: dagster-user-code
+    dockerfile: Dockerfile
+    resources:
+      cpu: 500
+      memory: 512
+
+helm-charts:
+  - name: dagster
+    chart_name: dagster
+    chart_version: "1.12.12"
+    chart_repository: https://dagster-io.github.io/helm
+    allow_cluster_wide_resources: true
+    values_override_file: .qovery/dagster-values.yaml

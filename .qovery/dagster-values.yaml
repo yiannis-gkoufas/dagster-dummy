@@ -1,0 +1,77 @@
+# Dagster Helm chart values for Qovery deployment
+# Reference: https://github.com/dagster-io/dagster/blob/master/helm/dagster/values.yaml
+
+# Run launcher configuration - uses K8s jobs for each run
+runLauncher:
+  type: K8sRunLauncher
+  config:
+    k8sRunLauncher:
+      imagePullPolicy: Always
+      loadInclusterConfig: true
+
+dagsterWebserver:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  service:
+    type: ClusterIP
+    port: 80
+
+dagsterDaemon:
+  enabled: true
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+# User code deployments subchart
+dagster-user-deployments:
+  enabled: true
+  enableSubchart: true
+  deployments:
+    - name: dagster-dummy
+      image:
+        repository: "{{ qovery.container.dagster-user-code.image }}"
+        tag: "{{ qovery.container.dagster-user-code.tag }}"
+        pullPolicy: Always
+      dagsterApiGrpcArgs:
+        - "-m"
+        - "dagster_dummy"
+      port: 3030
+      includeConfigInLaunchedRuns:
+        enabled: true
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+
+# PostgreSQL for run storage, event log, and schedule storage
+postgresql:
+  enabled: true
+  postgresqlUsername: dagster
+  postgresqlPassword: dagster  # TODO: Use Qovery secrets in production
+  postgresqlDatabase: dagster
+  service:
+    port: 5432
+  persistence:
+    enabled: true
+    size: 8Gi
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  dagsterWebserver:
+    host: ""  # Qovery will assign a host automatically
+    path: "/"
+    pathType: Prefix

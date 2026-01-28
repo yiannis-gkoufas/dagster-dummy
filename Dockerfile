@@ -10,15 +10,15 @@ RUN pip install --upgrade pip
 
 # Install dagster and any other dependencies your project requires
 RUN pip install \
-        dagster \
-        dagster-postgres \
-        dagster-k8s \
-        dagster-webserver
+        dagster==1.12.12 \
+        dagster-postgres==0.28.12 \
+        dagster-k8s==0.28.12 \
+        dagster-webserver==1.12.12
 
 WORKDIR /dagster_dummy
 
 # Install the project itself
 RUN pip install -e .
 
-# Expose the port that your Dagster instance will run on
-EXPOSE 80
+# Expose the gRPC port for code location server
+EXPOSE 3030
