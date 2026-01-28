@@ -62,9 +62,4 @@ postgresql:
     size: 8Gi
 
 ingress:
-  enabled: true
-  ingressClassName: nginx
-  dagsterWebserver:
-    host: ""
-    path: "/"
-    pathType: Prefix
+  enabled: false
