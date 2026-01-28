@@ -71,10 +71,6 @@ dagster-user-deployments:
 
 postgresql:
   enabled: true
-  image:
-    repository: docker.io/library/postgres
-    tag: latest
-    pullPolicy: Always
   postgresqlUsername: dagster
   postgresqlPassword: dagster
   postgresqlDatabase: dagster
