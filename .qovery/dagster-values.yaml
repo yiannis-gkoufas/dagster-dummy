@@ -1,7 +1,5 @@
 # Dagster Helm chart values for Qovery deployment
-# Reference: https://github.com/dagster-io/dagster/blob/master/helm/dagster/values.yaml
 
-# Run launcher configuration - uses K8s jobs for each run
 runLauncher:
   type: K8sRunLauncher
   config:
@@ -18,9 +16,6 @@ dagsterWebserver:
     limits:
       cpu: 500m
       memory: 1Gi
-  service:
-    type: ClusterIP
-    port: 80
 
 dagsterDaemon:
   enabled: true
@@ -32,15 +27,14 @@ dagsterDaemon:
       cpu: 500m
       memory: 1Gi
 
-# User code deployments subchart
 dagster-user-deployments:
   enabled: true
   enableSubchart: true
   deployments:
     - name: dagster-dummy
       image:
-        repository: "{{ qovery.container.dagster-user-code.image }}"
-        tag: "{{ qovery.container.dagster-user-code.tag }}"
+        repository: ghcr.io/yiannis-gkoufas/dagster-dummy
+        tag: latest
         pullPolicy: Always
       dagsterApiGrpcArgs:
         - "-m"
@@ -56,11 +50,10 @@ dagster-user-deployments:
           cpu: 500m
           memory: 1Gi
 
-# PostgreSQL for run storage, event log, and schedule storage
 postgresql:
   enabled: true
   postgresqlUsername: dagster
-  postgresqlPassword: dagster  # TODO: Use Qovery secrets in production
+  postgresqlPassword: dagster
   postgresqlDatabase: dagster
   service:
     port: 5432
@@ -72,6 +65,6 @@ ingress:
   enabled: true
   ingressClassName: nginx
   dagsterWebserver:
-    host: ""  # Qovery will assign a host automatically
+    host: ""
     path: "/"
     pathType: Prefix
