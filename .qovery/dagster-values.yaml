@@ -1,14 +1,16 @@
 # Dagster Helm chart values for Qovery deployment
 
-runLauncher:
-  type: K8sRunLauncher
-  config:
-    k8sRunLauncher:
-      imagePullPolicy: Always
-      loadInclusterConfig: true
+# Global image settings for Dagster components
+global:
+  dagsterHome: "/opt/dagster/dagster_home"
 
+# Dagster core images
 dagsterWebserver:
   replicaCount: 1
+  image:
+    repository: docker.io/dagster/dagster-webserver
+    tag: latest
+    pullPolicy: Always
   resources:
     requests:
       cpu: 250m
@@ -19,6 +21,10 @@ dagsterWebserver:
 
 dagsterDaemon:
   enabled: true
+  image:
+    repository: docker.io/dagster/dagster-daemon
+    tag: latest
+    pullPolicy: Always
   resources:
     requests:
       cpu: 250m
@@ -26,6 +32,19 @@ dagsterDaemon:
     limits:
       cpu: 500m
       memory: 1Gi
+
+runLauncher:
+  type: K8sRunLauncher
+  config:
+    k8sRunLauncher:
+      imagePullPolicy: Always
+      loadInclusterConfig: true
+      runK8sConfig:
+        containerConfig:
+          image:
+            repository: docker.io/dagster/dagster-k8s
+            tag: latest
+            pullPolicy: Always
 
 dagster-user-deployments:
   enabled: true
@@ -52,6 +71,10 @@ dagster-user-deployments:
 
 postgresql:
   enabled: true
+  image:
+    repository: docker.io/library/postgres
+    tag: latest
+    pullPolicy: Always
   postgresqlUsername: dagster
   postgresqlPassword: dagster
   postgresqlDatabase: dagster
